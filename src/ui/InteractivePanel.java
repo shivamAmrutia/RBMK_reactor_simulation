@@ -36,12 +36,8 @@ public class InteractivePanel extends JPanel {
     	
     	for (ControlRod rod : controlRods) {
     		rod.update();
-     	} 
-
-    	
-    	for (ControlRod rod : controlRods) {
-    	    rod.absorbNearbyNeutrons(neutrons, panelHeight);
-    	}
+    		rod.absorbNearbyNeutrons(neutrons, panelHeight);
+     	}
 
     }
     
