@@ -45,6 +45,15 @@ public class InteractivePanel extends JPanel {
 
     }
     
+    
+    public ArrayList<Neutron> getNeutronsList(){
+    	return neutrons;
+    }
+    
+    public ArrayList<ControlRod> getControlRodsList(){
+    	return controlRods;
+    }
+    
     ////////  Neutron Methods  ////////
     
     

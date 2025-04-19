@@ -22,8 +22,8 @@ public class FuelCell {
 
     // Determines if this fuel cell absorbs the neutron
     public boolean absorbs(Neutron n) {
-        int dx = Math.abs(n.x - x);
-        int dy = Math.abs(n.y - y);
+        int dx = Math.abs(n.x - this.x);
+        int dy = Math.abs(n.y - this.y);
         if (dx < 10 && dy < 10 && isFissile) {
             return Math.random() < 0.6; // 60% chance of fission
         }

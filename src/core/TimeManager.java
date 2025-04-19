@@ -1,15 +1,20 @@
 package core;
 
+import java.util.ArrayList;
+
+import ui.FuelCellPanel;
 import ui.InteractivePanel;
 
 public class TimeManager implements Runnable {
 	private final InteractivePanel panel;
+	private FuelCellPanel[][] fuelCellPanel;
     private Thread thread;
     private boolean running = false;
     private final int TICK_RATE_MS = 40;
 
-    public TimeManager(InteractivePanel panel) {
+    public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel) {
         this.panel = panel;
+        this.fuelCellPanel = fuelCellPanel;
     }
 
     public void start() {
@@ -35,7 +40,8 @@ public class TimeManager implements Runnable {
 
             // Update simulation
             panel.timerUpdate();
-
+            PhysicsEngine.updatePhysics(panel.getNeutronsList(), fuelCellPanel, panel.getControlRodsList());
+            
             // Schedule UI repaint on EDT
             javax.swing.SwingUtilities.invokeLater(panel::repaint);
 
