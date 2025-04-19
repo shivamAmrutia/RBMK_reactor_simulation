@@ -21,6 +21,14 @@ public class FuelCellPanel extends JPanel {
     private FuelCell fuelcell;
     int x, y;
     
+    public Water getWater() {
+    	return this.water;
+    }
+    
+    public FuelCell getFuelCell() {
+    	return this.fuelcell;
+    }
+    
     public FuelCellPanel() {
         setPreferredSize(new Dimension(30, 30));
         int size = Math.min(getWidth(), getHeight()) - 10;

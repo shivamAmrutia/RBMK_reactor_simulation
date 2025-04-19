@@ -32,11 +32,10 @@ public class ReactorSimulatorUI {
     static int panelWidth = COLS * cellSize;
     static int panelHeight = ROWS * cellSize;
     private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
-    private TimeManager timeManager = new TimeManager(interactiveLayer);
+    private TimeManager timeManager;
 
     
     public ReactorSimulatorUI() {
-    	
         frame = new JFrame("Chernobyl Reactor Simulator");
         frame.setSize(1000, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,6 +55,9 @@ public class ReactorSimulatorUI {
                 fuelcells[i][j].setState(false, 50);
             }            
         }
+        
+        //initializing timeManager to ensure fuellCells are populated before passing reference
+        timeManager = new TimeManager(interactiveLayer, fuelcells);
         
         /////////////////  Interactive Layer (Neutrons, Moderators, and Control Rods) ///////////////////////////
         
