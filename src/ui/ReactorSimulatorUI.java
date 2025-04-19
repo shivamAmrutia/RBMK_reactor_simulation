@@ -152,10 +152,9 @@ public class ReactorSimulatorUI {
     // Generate Interactive Layer
     
 	private void generateinteractiveLayer() {		
-		interactiveLayer.clearAllNeutrons();
+		interactiveLayer.setupNeutrons(30);
 		interactiveLayer.setupControlRods();
 		interactiveLayer.setupModerators();
-		interactiveLayer.addRandomNeutrons(30);
 	}
 	
 	// Returns Interactive Layer
@@ -188,10 +187,10 @@ public class ReactorSimulatorUI {
 	// Adjust Control Rods
 	
     private void adjustControlRods() {
-	int sliderValue = controlRodSlider.getValue();
-	    int depth = (int) ((sliderValue / 100.0) * (ROWS * cellSize));
-	    interactiveLayer.setControlRodDepth(depth);
-    }
+		int sliderValue = controlRodSlider.getValue();
+		    int depth = (int) ((sliderValue / 100.0) * (ROWS * cellSize));
+		    interactiveLayer.setControlRodDepth(depth);
+	    }
     	
 }
 

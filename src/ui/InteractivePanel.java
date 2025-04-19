@@ -36,15 +36,13 @@ public class InteractivePanel extends JPanel {
     	
     	for (ControlRod rod : controlRods) {
     		rod.update();
-     	} 
-
-    	
-    	for (ControlRod rod : controlRods) {
-    	    rod.absorbNearbyNeutrons(neutrons, panelHeight);
-    	}
+    		rod.absorbNearbyNeutrons(neutrons, panelHeight);
+     	}
 
     }
     
+
+    ////////  Methods  ////////
     
     public ArrayList<Neutron> getNeutronsList(){
     	return neutrons;
@@ -56,11 +54,11 @@ public class InteractivePanel extends JPanel {
     
     ////////  Neutron Methods  ////////
     
+    // 1) Setup by Adding Neutrons Randomly
     
-    // 1) Adding Neutrons Randomly
-    
-    public void addRandomNeutrons(int count) {
-        Random rand = new Random();
+    public void setupNeutrons(int count) {
+    	neutrons.clear();
+    	Random rand = new Random();
         for (int i = 0; i < count; i++) {
         	int x, y;
         	do {
@@ -69,28 +67,18 @@ public class InteractivePanel extends JPanel {
         	}while(moderatorSpace.contains(x));
 	        neutrons.add(new Neutron(x, y));
         }
-    } 
-    // 4) Clearing All Neutrons 
+		
+	}
     
-    public void clearAllNeutrons() {
-        neutrons.clear();
-    }
+   
     
-    // 5) Clearing Given Neutron
-    
-    public void clearNeutron(Neutron n) {
-    	neutrons.remove(n);
-    }
-    
-    // 6) Get Neutron Count
+    // 2) Get Neutron Count
     
     public int getNeutronCount() {
         return neutrons.size();
     }
-
-    ////////  Control Rods Methods  ////////
     
-    // 1) Seting Up Control Rods
+    // 3) Seting Up Control Rods
 
     public void setupControlRods() {
         controlRods.clear();
@@ -109,20 +97,16 @@ public class InteractivePanel extends JPanel {
         }
     }
     
-    // 2) Seting Control Rod Depth
+    // 4) Seting Control Rod Depth
     
     public void setControlRodDepth(int depth) {
         for (ControlRod rod : controlRods) {
             rod.setTargetHeight(depth);
         }
     }
+        
     
-    
-    
-    /////////  Moderators Methods  //////////
-    
-    
-    // 1) Seting Up Moderators
+    // 5) Seting Up Moderators
     
     public void setupModerators() {
 		moderators.clear();
@@ -156,6 +140,8 @@ public class InteractivePanel extends JPanel {
     	    rod.draw(g2d);
     	} 
     }
+
+	
 	
 }
 
