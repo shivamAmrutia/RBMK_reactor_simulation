@@ -1,6 +1,8 @@
 package ui;
 import core.Neutron;
-import core.TimerClock;
+import core.TimeManager;
+
+//import core.TimerClock;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,9 +31,10 @@ public class ReactorSimulatorUI {
     private final static int cellSize = 34;
     static int panelWidth = COLS * cellSize;
     static int panelHeight = ROWS * cellSize;
-    private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize);    
-    
+    private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
+    private TimeManager timeManager = new TimeManager(interactiveLayer);
 
+    
     public ReactorSimulatorUI() {
     	
         frame = new JFrame("Chernobyl Reactor Simulator");
@@ -39,7 +42,7 @@ public class ReactorSimulatorUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        //////////////////  Reactor core grid (Elements: Fuelcell + Water) ////////////////////
+        //////////////////  Reactor core grid (Elements: Fuel cell + Water) ////////////////////
         
         reactorPanel = new JPanel();
         reactorPanel.setLayout(new GridLayout(ROWS, COLS, 4, 4)); 
@@ -128,6 +131,17 @@ public class ReactorSimulatorUI {
                 generateinteractiveLayer();                
             }
         });
+        
+        startButton.addActionListener(e -> timeManager.start());
+        stopButton.addActionListener(e -> timeManager.stop());
+
+        frame.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                timeManager.stop(); // stop thread on close
+            }
+        });
+
+        
         frame.setVisible(true);
     }
 	    

@@ -15,8 +15,8 @@ public class Neutron {
         this.x = x;
         this.y = y;
         do {
-            this.dx = rand.nextInt(16) - 8;
-            this.dy = rand.nextInt(16) - 8;
+            this.dx = rand.nextInt(1, 8);
+            this.dy = rand.nextInt(1, 8);
        } while (Math.abs(dx) < 2 && Math.abs(dy) < 2);
        
     }

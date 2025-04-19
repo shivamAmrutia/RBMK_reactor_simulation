@@ -28,11 +28,21 @@ public class InteractivePanel extends JPanel {
     
     public void timerUpdate() {
     	for (Neutron n : neutrons) {  
-    		slowDown(n);
+    		n.move(getWidth(), getHeight());
+    		for (Moderator m : moderators) {
+    	        m.trySlowDown(n);
+    	    }
     	}      
+    	
+    	for (ControlRod rod : controlRods) {
+    		rod.update();
+     	} 
 
-        //TODO  absorbNeutrons();
-        repaint();
+    	
+    	for (ControlRod rod : controlRods) {
+    	    rod.absorbNearbyNeutrons(neutrons, panelHeight);
+    	}
+
     }
     
     ////////  Neutron Methods  ////////
@@ -50,57 +60,7 @@ public class InteractivePanel extends JPanel {
         	}while(moderatorSpace.contains(x));
 	        neutrons.add(new Neutron(x, y));
         }
-    }
-    
-    // 2) Moderators Slow Down Neutrons
-    
-    public void slowDown(Neutron n) {
-        for (Moderator m : moderators) {
-            if (n.x - m.x <= 10 && m.x - n.x <= 6) {
-                Random rand = new Random();                
-                boolean moveRight = true;
-                if (n.dx > 0) moveRight = false; 
-                
-                n.dx = -n.dx;
-                
-                if (Math.sqrt(Math.pow(n.dx, 2) + Math.pow(n.dy, 2)) > 5) {
-	                int dx, dy;
-	                do {
-	                    dy = rand.nextInt(8) - 4;
-	                    dx = rand.nextInt(8) - 4;
-	                }while(dx == 0 && dy == 0);
-	                
-	                if (moveRight) n.dx = Math.abs(dx);
-	                else n.dx = -Math.abs(dx);
-	          
-	                n.dy = dy;	
-	                if(n.dx > 0) {
-	                	n.x = Math.max(m.x + 10, n.x + n.dx);
-	                }
-	                else {
-	                	n.x = Math.min(m.x - 10, n.x + n.dx);
-	                }
-                }
-            }
-        }
-    }
-    
-    // 3) Control Rods Absorb Neutrons
-    
-    public void absorbNeutrons() {
-    	for (ControlRod c : controlRods) {
-    		for (Neutron n: neutrons) {
-        		if (c.currentHeight != c.y) {
-        			if (n.x - c.x <= 10 && c.x - n.x <= 6) {
-        				if((c.y == 0 && n.y <= c.currentHeight) || (c.y == panelHeight && n.y >= (c.currentHeight))) {
-        					clearNeutron(n);
-        				}
-        			}
-        		}
-        	}
-    	}    	
-    }
-    
+    } 
     // 4) Clearing All Neutrons 
     
     public void clearAllNeutrons() {
@@ -180,12 +140,10 @@ public class InteractivePanel extends JPanel {
         }
         
         for (Neutron n : neutrons) {
-        	n.move(getWidth(), getHeight());
         	n.draw(g2d);
         }
         
         for (ControlRod rod : controlRods) {
-    	    rod.update();
     	    rod.draw(g2d);
     	} 
     }

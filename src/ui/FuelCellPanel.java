@@ -37,7 +37,7 @@ public class FuelCellPanel extends JPanel {
     }
     
 	public void addWater() {
-		 this.water = new Water(temperature);
+		 this.water = new Water(x, y, temperature);
 	}
 	
 	public void addFuelCell() {

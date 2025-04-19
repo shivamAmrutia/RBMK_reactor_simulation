@@ -2,6 +2,8 @@ package core;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class ControlRod {
@@ -16,7 +18,7 @@ public class ControlRod {
         this.x = x;
         this.y = y;
         this.velocity = 2;
-        this.currentHeight = y;
+        this.currentHeight = 0;
     }
 
     public void setTargetHeight(int height) {
@@ -31,6 +33,25 @@ public class ControlRod {
             currentHeight = Math.max(currentHeight - velocity, targetHeight);
         }
     } 
+    
+    public void absorbNearbyNeutrons(List<Neutron> neutrons, int panelHeight) {
+        Iterator<Neutron> it = neutrons.iterator();
+        while (it.hasNext()) {
+            Neutron n = it.next();
+            
+            if (currentHeight != 0) { 
+                boolean withinXRange = n.x - x <= 7 && x - n.x <= 3;
+                boolean withinYRange = 
+                    (y == 0 && n.y <= currentHeight) || 
+                    (y == panelHeight && n.y >= currentHeight);
+                
+                if (withinXRange && withinYRange) {
+                    it.remove();  // absorb the neutron
+                }
+            }
+        }
+    }
+
     
     public void draw(Graphics2D g) {
         g.setColor(Color.DARK_GRAY);
