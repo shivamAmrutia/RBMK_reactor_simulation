@@ -2,47 +2,55 @@ package core;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
 
 public class Water {
     private int temperature;
     private int x, y;
+    private int posX, posY;
     private static final int EVAPORATION_TEMP = 100;
 
-    public Water(int x, int y, int temperature) {
+    public Water(int x, int y, int posX, int posY, int temperature) {
         this.x = x;
         this.y = y;
         this.temperature = temperature; // default room temperature
-    }
+        this.posX = posX;
+        this.posY = posY;
+    } 
 
     public void updateTemperature(int updatedTemperature) {
         this.temperature = updatedTemperature;
     }
     
-    public boolean absorbs(Neutron n) {
-        if (isEvaporated()) return false;
-
-        int dx = Math.abs(n.x - x);
-        int dy = Math.abs(n.y - y);
-        if (dx < 10 && dy < 10 && Math.random() < 0.4) { // 40% absorption chance
-            this.updateTemperature(this.temperature + 5); // heats up on absorption
-            return true;
+    public boolean isInRange(Neutron n) {
+        if (isEvaporated()) return false;        
+        if (n.x > posX && n.y > posY && n.x < 30 + posX && n.y < 30 + posY) {
+        	return true;
         }
         return false;
     }
 
+    public boolean absorbs(Neutron n) {
+    	Random random = new Random();
+        int prob = random.nextInt(100);
+        if(prob < 2) {
+        	return true;
+        }
+        return false;
+           	
+    }
     
     public boolean isEvaporated() {
         return temperature >= EVAPORATION_TEMP;
     }
 
     public void coolDown() {
-        if (this.temperature > 20) this.updateTemperature(this.temperature - 1);;
+        if (this.temperature > 20) this.temperature -= 1;
     }
     
     public void heatUp() {
-        if (!isEvaporated() && Math.random() < 0.3) { // 30% chance to heat up slightly
-            int updatedTemperature = this.temperature +  1 + (int)(Math.random() * 3); // increase by 1–3 degrees
-            this.updateTemperature(updatedTemperature);
+        if (!isEvaporated()) { // 30% chance to heat up slightly
+            this.temperature +=  10 + (int)(Math.random() * 5); // increase by 1–3 degrees
         }
     }
 
@@ -50,11 +58,9 @@ public class Water {
         return temperature;
     }
 
-    public int getX() { return x; }
-    public int getY() { return y; }
 
     public void draw(Graphics g) {
-        float ratio = Math.min(temperature / 100f, 1.0f);
+        float ratio = Math.min(this.temperature / 100f, 1.0f);
 
         int r = (int)((1 - ratio) * 0 + ratio * 255);
         int gColor = (int)((1 - ratio) * 204 + ratio * 80);

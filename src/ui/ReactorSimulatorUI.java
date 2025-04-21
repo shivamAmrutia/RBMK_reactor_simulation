@@ -45,11 +45,11 @@ public class ReactorSimulatorUI {
         
         reactorPanel = new JPanel();
         reactorPanel.setLayout(new GridLayout(ROWS, COLS, 4, 4)); 
-        fuelcells = new FuelCellPanel[ROWS][COLS];
+        fuelcells = new FuelCellPanel[ROWS][COLS]; 
 
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                FuelCellPanel cell = new FuelCellPanel();
+                FuelCellPanel cell = new FuelCellPanel(j * cellSize, i * cellSize);
                 reactorPanel.add(cell);
                 fuelcells[i][j] = cell;
                 fuelcells[i][j].setState(false, 50);

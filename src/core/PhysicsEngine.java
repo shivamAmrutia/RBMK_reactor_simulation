@@ -29,22 +29,23 @@ public class PhysicsEngine {
         Iterator<Neutron> iter = neutrons.iterator();
         while (iter.hasNext()) {
             Neutron n = iter.next();
-            
-            
+                        
             //should we handle control rod absorption here as well
             
-            // Water Absorption
+         // Water Absorption
             for (FuelCellPanel[] fuelCellPanelList : fuelCellPanel) {
+            	boolean isabsorbed = false;
             	for(FuelCellPanel fuelPanel : fuelCellPanelList) {
-            		if (fuelPanel.getWater().absorbs(n)) {
+            		if (fuelPanel.getWater().isInRange(n)) {
             			fuelPanel.getWater().heatUp();
-            			if(iter.hasNext()) {
-            				iter.next();
-            				iter.remove();            				
-            			}
-            			break;
-            		}            		
+            			if (fuelPanel.getWater().absorbs(n)){
+            				iter.remove();  
+            				isabsorbed = true;
+            			}            				
+            			break;   
+            		}  	       		
             	}
+            	if (isabsorbed) break;
             }
         }
     }
