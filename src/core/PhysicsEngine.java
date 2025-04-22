@@ -36,13 +36,16 @@ public class PhysicsEngine {
             for (FuelCellPanel[] fuelCellPanelList : fuelCellPanel) {
             	boolean isabsorbed = false;
             	for(FuelCellPanel fuelPanel : fuelCellPanelList) {
-            		if (fuelPanel.getWater().isInRange(n)) {
-            			fuelPanel.getWater().heatUp();
-            			if (fuelPanel.getWater().absorbs(n)){
+            		Water water = fuelPanel.getWater();
+            		if (water.isInRange(n)) {
+            			water.heatUp();
+            			if (water.absorbs(n)){
             				iter.remove();  
             				isabsorbed = true;
             			}            				
             			break;   
+            		}else{
+            			water.coolDown();
             		}  	       		
             	}
             	if (isabsorbed) break;

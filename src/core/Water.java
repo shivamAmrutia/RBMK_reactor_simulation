@@ -27,6 +27,7 @@ public class Water {
         if (n.x > posX && n.y > posY && n.x < 30 + posX && n.y < 30 + posY) {
         	return true;
         }
+        
         return false;
     }
 
@@ -45,12 +46,14 @@ public class Water {
     }
 
     public void coolDown() {
-        if (this.temperature > 20) this.temperature -= 1;
+        if (this.temperature > 100) {
+        	this.temperature -= 10;
+        }
     }
     
     public void heatUp() {
         if (!isEvaporated()) { // 30% chance to heat up slightly
-            this.temperature +=  10 + (int)(Math.random() * 5); // increase by 1–3 degrees
+            this.temperature +=  5 + (int)(Math.random() * 5); // increase by 1–3 degrees
         }
     }
 
@@ -60,13 +63,19 @@ public class Water {
 
 
     public void draw(Graphics g) {
+    	
         float ratio = Math.min(this.temperature / 100f, 1.0f);
 
         int r = (int)((1 - ratio) * 0 + ratio * 255);
         int gColor = (int)((1 - ratio) * 204 + ratio * 80);
         int b = (int)((1 - ratio) * 255 + ratio * 80);
-
+        if(r == 255) {
+        	r = 192;
+        	gColor = 192;
+        	b = 192;
+        }
         Color waterColor = new Color(r, gColor, b);
+        
         g.setColor(waterColor);
         g.fillRect(x, y, 30, 30);
     }

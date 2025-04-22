@@ -178,7 +178,7 @@ public class ReactorSimulatorUI {
 	    for (int i = 0; i < ROWS; i++) { 
 	        for (int j = 0; j < COLS; j++) {
 	            boolean isFissile = rand.nextInt(100) < percentage;
-	            int temp = rand.nextInt(100); // simulate water temp
+	            int temp = 0; // simulate water temp
 	            fuelcells[i][j].setState(isFissile, temp);
 	        }
 	    }	   
