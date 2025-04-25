@@ -70,6 +70,22 @@ public class InteractivePanel extends JPanel {
 		
 	}
     
+    
+    // 2) Adding Random Neutrons
+    
+    public void addRandomNeutrons(int count) {
+    	Random rand = new Random();
+        for (int i = 0; i < count; i++) {
+        	int x, y;
+        	do {
+		           x = rand.nextInt(panelWidth);
+		           y = rand.nextInt(panelHeight); 
+        	}while(moderatorSpace.contains(x));
+	        neutrons.add(new Neutron(x, y));
+        }
+		
+	}
+    
    
     
     // 2) Get Neutron Count
@@ -113,7 +129,7 @@ public class InteractivePanel extends JPanel {
 		
 		for (int i = 0; i < panelWidth / cellSize; i += 3) {
 			int x = (i - 1) * cellSize + (cellSize - 2);
-	        moderators.add(new Moderator(x, panelHeight));
+	        moderators.add(new Moderator(x, 0, panelHeight));
 	        for(int j = -6; j <= 10; j += 1) {
 	        	moderatorSpace.add(x + j);
 	        }

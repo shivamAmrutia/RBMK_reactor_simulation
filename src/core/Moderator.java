@@ -7,10 +7,12 @@ import java.util.Random;
 
 public class Moderator {
     public int x; 
+    public int y;
     public int height;
     
-    public Moderator(int x, int height) {
+    public Moderator(int x, int y, int height) {
         this.x = x;
+        this.y = y;
         this.height = height;
     }
     
@@ -44,6 +46,6 @@ public class Moderator {
     public void draw(Graphics2D g) {
         g.setColor(Color.YELLOW);
         g.setStroke(new BasicStroke(2));
-        g.drawRect(x, 0, 4, height);       
+        g.drawRect(x, y, 4, height);       
     }
 }

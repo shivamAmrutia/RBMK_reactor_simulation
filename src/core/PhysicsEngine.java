@@ -10,16 +10,14 @@ import ui.InteractivePanel;
 public class PhysicsEngine {
 
     private static final Random rand = new Random();
+    private static ArrayList<FuelCell> convertToXenon = new ArrayList<>();
     
-    
-
     public static void updatePhysics(ArrayList<Neutron> neutrons,
                                      FuelCellPanel[][] fuelCellPanel,
                                      ArrayList<ControlRod> controlRods) 
     {
         handleAbsorption(neutrons, fuelCellPanel, controlRods);
         handleFission(neutrons, fuelCellPanel);
-        // Future: handleXenonBuildUp(...)
     }
 
     public static void handleAbsorption(ArrayList<Neutron> neutrons,
@@ -42,11 +40,11 @@ public class PhysicsEngine {
             			if (water.absorbs(n)){
             				iter.remove();  
             				isabsorbed = true;
-            			}            				
-            			break;   
-            		}else{
-            			water.coolDown();
-            		}  	       		
+            			}    
+            		} 
+            		else {
+            			water.coolDown();          	            			
+            		}
             	}
             	if (isabsorbed) break;
             }
@@ -59,20 +57,41 @@ public class PhysicsEngine {
         for (FuelCellPanel[] fuelCellPanelList : fuelCellPanel) {
         	for(FuelCellPanel fuelPanel: fuelCellPanelList) {
         		Iterator<Neutron> it = neutrons.iterator();
+        		FuelCell fuelcell = fuelPanel.getFuelCell();
         		while(it.hasNext()){
         			Neutron n = it.next();
-        			if (fuelPanel.getFuelCell().absorbs(n)) {
+        			if (!fuelcell.getXenon() && fuelcell.absorbs(n)) {
         				it.remove();
-        				fuelPanel.getFuelCell().updateFissile();
-        				int emitted = rand.nextInt(3) + 2; // emit 2-4 neutrons
+        				fuelcell.updateFissile();
+    					int emitted = rand.nextInt(3) + 2; // emit 2-4 neutrons
         				for (int i = 0; i < emitted; i++) {
-        					newNeutrons.add(fuelPanel.getFuelCell().emitNeutron());
+        					newNeutrons.add(fuelcell.emitNeutron());
         				}
-        			}        		
-        		}        		
+        				int prob = rand.nextInt(9);
+        		        if(prob < 3) {
+        		        	convertToXenon.add(fuelcell);
+        		        } 
+        				break;
+        			}
+        			else if(fuelcell.getXenon() && fuelcell.isInRange(n)) {
+        				it.remove();
+        				fuelcell.updateFissile();
+        				fuelcell.updateXenon(); 
+        				convertToXenon.remove(fuelcell);
+        				
+        			}
+        		}
+        		
         	}
         	
         }
         neutrons.addAll(newNeutrons);
     }
+
+	public static void makeXenon() {
+			for(FuelCell f: convertToXenon) {
+				f.makeXenon();
+			}
+	}
+	
 }

@@ -32,6 +32,7 @@ public class ControlRod {
         if (currentHeight > targetHeight) {
             currentHeight = Math.max(currentHeight - velocity, targetHeight);
         }
+        
     } 
     
     public void absorbNearbyNeutrons(List<Neutron> neutrons, int panelHeight) {
@@ -43,11 +44,12 @@ public class ControlRod {
                 boolean withinXRange = n.x - x <= 7 && x - n.x <= 3;
                 boolean withinYRange = 
                     (y == 0 && n.y <= currentHeight) || 
-                    (y == panelHeight && n.y >= currentHeight);
+                    (y == panelHeight && n.y >= y - currentHeight);
                 
                 if (withinXRange && withinYRange) {
                     it.remove();  // absorb the neutron
                 }
+       
             }
         }
     }

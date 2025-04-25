@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import ui.FuelCellPanel;
 import ui.InteractivePanel;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 public class TimeManager implements Runnable {
 	private final InteractivePanel panel;
@@ -11,6 +13,7 @@ public class TimeManager implements Runnable {
     private Thread thread;
     private boolean running = false;
     private final int TICK_RATE_MS = 40;
+    private final ConcurrentLinkedQueue<Runnable> eventQueue = new ConcurrentLinkedQueue<>();
 
     public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel) {
         this.panel = panel;
@@ -32,14 +35,26 @@ public class TimeManager implements Runnable {
             e.printStackTrace();
         }
     }
+    
+    public void enqueue(Runnable event) {
+        eventQueue.add(event);
+    }
+
 
     @Override
     public void run() {
+    	int ctr = 0;
         while (running) {
             long startTime = System.currentTimeMillis();
+            
+            if(ctr == 5) {
+            	PhysicsEngine.makeXenon();
+            	ctr = 0;
+            }
 
             // Update simulation
             panel.timerUpdate();
+            panel.addRandomNeutrons(1);
             PhysicsEngine.updatePhysics(panel.getNeutronsList(), fuelCellPanel, panel.getControlRodsList());
             
             // Schedule UI repaint on EDT
@@ -55,6 +70,8 @@ public class TimeManager implements Runnable {
                     Thread.currentThread().interrupt();
                 }
             }
+            
+            ctr += 1;
         }
     }
 }

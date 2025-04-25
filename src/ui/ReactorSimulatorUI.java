@@ -188,7 +188,7 @@ public class ReactorSimulatorUI {
 	
     private void adjustControlRods() {
 		int sliderValue = controlRodSlider.getValue();
-		    int depth = (int) ((sliderValue / 100.0) * (ROWS * cellSize));
+		    int depth = (int) ((sliderValue / 100.0) * panelHeight);
 		    interactiveLayer.setControlRodDepth(depth);
 	    }
     	

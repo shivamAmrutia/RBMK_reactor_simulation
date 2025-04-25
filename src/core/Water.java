@@ -5,10 +5,10 @@ import java.awt.Graphics;
 import java.util.Random;
 
 public class Water {
-    private int temperature;
+    private float temperature;
     private int x, y;
     private int posX, posY;
-    private static final int EVAPORATION_TEMP = 100;
+    private static final float EVAPORATION_TEMP = 100;
 
     public Water(int x, int y, int posX, int posY, int temperature) {
         this.x = x;
@@ -46,18 +46,16 @@ public class Water {
     }
 
     public void coolDown() {
-        if (this.temperature > 100) {
-        	this.temperature -= 10;
-        }
+        this.temperature = (float) Math.max(this.temperature - 0.01, 0);
     }
     
     public void heatUp() {
-        if (!isEvaporated()) { // 30% chance to heat up slightly
-            this.temperature +=  5 + (int)(Math.random() * 5); // increase by 1–3 degrees
+        if (!isEvaporated()) {
+            this.temperature +=  3 + (int)(Math.random() * 5); // increase by 1–3 degrees
         }
     }
 
-    public int getTemperature() {
+    public float getTemperature() {
         return temperature;
     }
 
