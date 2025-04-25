@@ -189,8 +189,10 @@ public class ReactorSimulatorUI {
     private void adjustControlRods() {
 		int sliderValue = controlRodSlider.getValue();
 		    int height = (int) ((sliderValue / 100.0) * panelHeight);
+		    // 3 parts adjusted: control rod of height (max 35% panelheight), connectors positioned after controlrods (of height =  panelheight/10), modetors postioned after both
 		    interactiveLayer.setControlRodHeight(height);
-		    interactiveLayer.setModeratorsYPosition(height + 1);
+		    interactiveLayer.setConnectorsYPosition(height);
+		    interactiveLayer.setModeratorsYPosition(height + panelHeight / 10 );
 	    }
     	
 }

@@ -35,7 +35,7 @@ public class ControlRod {
         
     } 
     
-    public void absorbNearbyNeutrons(List<Neutron> neutrons, int panelHeight) {
+    public void absorbNearbyNeutrons(List<Neutron> neutrons) {
         Iterator<Neutron> it = neutrons.iterator();
         while (it.hasNext()) {
             Neutron n = it.next();
@@ -46,8 +46,7 @@ public class ControlRod {
                 
                 if (withinXRange && withinYRange) {
                     it.remove();  // absorb the neutron
-                }
-       
+                }       
             }
         }
     }

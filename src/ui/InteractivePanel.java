@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import core.ControlRod;
+import core.GraphiteConnector;
 import core.Neutron;
 import core.Moderator;
 
@@ -14,6 +15,7 @@ public class InteractivePanel extends JPanel {
     private ArrayList<Neutron> neutrons = new ArrayList<>();
     private final ArrayList<ControlRod> controlRods = new ArrayList<>();
     private final ArrayList<Moderator> moderators = new ArrayList<>();
+    private final ArrayList<GraphiteConnector> connectors = new ArrayList<>();
     private final ArrayList<Integer> moderatorSpace = new ArrayList<>();
     private int panelWidth, panelHeight, cellSize;
 
@@ -29,17 +31,20 @@ public class InteractivePanel extends JPanel {
     public void timerUpdate() {
     	for (Neutron n : neutrons) {  
     		n.move(getWidth(), getHeight());
-    		for (Moderator m : moderators) {
-    	        m.trySlowDown(n);
-    	    }
     	}      
     	
-    	for(Moderator m: moderators) {
+    	for (Moderator m: moderators) {
     		m.update();
+    		m.trySlowDown(neutrons);
     	}
+    	
+    	for (GraphiteConnector gc: connectors) {
+    		gc.update();
+    	}
+    	
     	for (ControlRod rod : controlRods) {
     		rod.update();
-    		rod.absorbNearbyNeutrons(neutrons, panelHeight);
+    		rod.absorbNearbyNeutrons(neutrons);
      	}
 
     }
@@ -106,7 +111,8 @@ public class InteractivePanel extends JPanel {
         	// Rods from top
             int x = (i - 1) * cellSize + (cellSize - 2);
             controlRods.add(new ControlRod(x, 0));    
-            moderators.add(new Moderator(x, 0, panelHeight/2));
+            connectors.add(new GraphiteConnector(x + 1, 0, panelHeight / 10));
+            moderators.add(new Moderator(x, panelHeight / 10, panelHeight / 2));
             for(int j = -6; j <= 10; j += 1) {
 	        	moderatorSpace.add(x + j);
 	        }
@@ -145,6 +151,11 @@ public class InteractivePanel extends JPanel {
     	}
     }
     
+    public void setConnectorsYPosition(int y) {
+    	for (GraphiteConnector gc: connectors) {
+    		gc.setYPos(y);
+    	}
+    }
     
     ////////  Paint Component  ////////
 
@@ -152,10 +163,12 @@ public class InteractivePanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
-        for(Moderator m: moderators) {
+        for (Moderator m: moderators) {
         	m.draw(g2d);
         }
-        
+        for (GraphiteConnector gc: connectors) {
+        	gc.draw(g2d);
+        }
         for (Neutron n : neutrons) {
         	n.draw(g2d);
         }
