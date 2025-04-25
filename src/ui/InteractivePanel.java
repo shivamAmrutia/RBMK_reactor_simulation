@@ -34,6 +34,9 @@ public class InteractivePanel extends JPanel {
     	    }
     	}      
     	
+    	for(Moderator m: moderators) {
+    		m.update();
+    	}
     	for (ControlRod rod : controlRods) {
     		rod.update();
     		rod.absorbNearbyNeutrons(neutrons, panelHeight);
@@ -98,26 +101,23 @@ public class InteractivePanel extends JPanel {
 
     public void setupControlRods() {
         controlRods.clear();
-        
-        for (int i = 1; i < panelWidth / cellSize; i += 3) {
+        moderators.clear();
+        for (int i = 2; i < panelWidth / cellSize; i += 4) {
         	// Rods from top
-        	if(i % 6 == 1) {
-	            int x = (i - 1) * cellSize + (cellSize - 2);
-	            controlRods.add(new ControlRod(x, 0));
-        	}
-        	// Rods from bottom
-        	else if(i % 6 == 4) {
-        		int x = (i - 1) * cellSize + (cellSize - 2);
-                controlRods.add(new ControlRod(x, panelHeight));
-        	}        	
+            int x = (i - 1) * cellSize + (cellSize - 2);
+            controlRods.add(new ControlRod(x, 0));    
+            moderators.add(new Moderator(x, 0, panelHeight/2));
+            for(int j = -6; j <= 10; j += 1) {
+	        	moderatorSpace.add(x + j);
+	        }
         }
     }
     
     // 4) Seting Control Rod Depth
     
-    public void setControlRodDepth(int depth) {
+    public void setControlRodHeight(int height) {
         for (ControlRod rod : controlRods) {
-            rod.setTargetHeight(depth);
+            rod.setTargetHeight(height);
         }
     }
         
@@ -125,9 +125,8 @@ public class InteractivePanel extends JPanel {
     // 5) Seting Up Moderators
     
     public void setupModerators() {
-		moderators.clear();
-		
-		for (int i = 0; i < panelWidth / cellSize; i += 3) {
+    	
+		for (int i = 0; i < panelWidth / cellSize; i += 4) {
 			int x = (i - 1) * cellSize + (cellSize - 2);
 	        moderators.add(new Moderator(x, 0, panelHeight));
 	        for(int j = -6; j <= 10; j += 1) {
@@ -136,6 +135,15 @@ public class InteractivePanel extends JPanel {
         }
 		
 	}
+    
+    public void setModeratorsYPosition(int y) {
+    	// lower position of moderators connected below the control rod
+    	for (Moderator m :moderators) {
+    		if (m.height != panelHeight) {
+    			m.setYPos(y);
+    		}
+    	}
+    }
     
     
     ////////  Paint Component  ////////

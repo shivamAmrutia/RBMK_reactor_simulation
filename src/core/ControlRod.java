@@ -42,9 +42,7 @@ public class ControlRod {
             
             if (currentHeight != 0) { 
                 boolean withinXRange = n.x - x <= 7 && x - n.x <= 3;
-                boolean withinYRange = 
-                    (y == 0 && n.y <= currentHeight) || 
-                    (y == panelHeight && n.y >= y - currentHeight);
+                boolean withinYRange = y == 0 && n.y <= currentHeight;
                 
                 if (withinXRange && withinYRange) {
                     it.remove();  // absorb the neutron
@@ -56,12 +54,8 @@ public class ControlRod {
 
     
     public void draw(Graphics2D g) {
-        g.setColor(Color.DARK_GRAY);
-        if(y > 0) {
-        	g.fillRect(x, y - currentHeight, 4, currentHeight);
-        }
-        else {
-        	g.fillRect(x, 0, 4, currentHeight);
-        }
+        g.setColor(Color.DARK_GRAY);       
+    	g.fillRect(x, 0, 4, currentHeight);
+        
     }
 }
