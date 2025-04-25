@@ -15,12 +15,6 @@ public class GraphiteConnector{
 		this.velocity = 2;
 	}
 	
-	public void draw(Graphics2D g) {
-        g.setColor(Color.BLACK);       
-    	g.fillRect(x, y, 2, height);
-        
-    }
-
 	public void setYPos(int y_new) {
 		this.y_new = y_new;
 	}
@@ -33,4 +27,11 @@ public class GraphiteConnector{
 	            y = Math.max(y - velocity, y_new);
 	        }		
 	}
+	
+	public void draw(Graphics2D g) {
+        g.setColor(Color.BLACK);       
+    	g.fillRect(x, y, 2, height);
+        
+    }
+	
 }
