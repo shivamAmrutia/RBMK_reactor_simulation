@@ -11,6 +11,7 @@ public class PhysicsEngine {
 
     private static final Random rand = new Random();
     private static ArrayList<FuelCell> convertToXenon = new ArrayList<>();
+    private static ArrayList<FuelCell> convertToFissile = new ArrayList<>();
     
     public static void updatePhysics(ArrayList<Neutron> neutrons,
                                      FuelCellPanel[][] fuelCellPanel,
@@ -80,6 +81,9 @@ public class PhysicsEngine {
         				convertToXenon.remove(fuelcell);
         				
         			}
+        			else if(!fuelcell.getFissile()) {
+    		        	convertToFissile.add(fuelcell);
+        			}
         		}
         		
         	}
@@ -88,6 +92,14 @@ public class PhysicsEngine {
         neutrons.addAll(newNeutrons);
     }
 
+    public static void makeFissile(int count) {
+    	while(count > 0) {
+    		// randomly converts a non fissile element to fissile
+    		int randidx = rand.nextInt(convertToFissile.size());
+    		convertToFissile.remove(randidx).updateFissile();
+    		count -= 1;
+    	}
+    }
 	public static void makeXenon() {
 			for(FuelCell f: convertToXenon) {
 				f.makeXenon();

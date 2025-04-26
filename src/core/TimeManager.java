@@ -49,6 +49,7 @@ public class TimeManager implements Runnable {
             
             if(ctr == 5) {
             	PhysicsEngine.makeXenon();
+            	PhysicsEngine.makeFissile(5);
             	ctr = 0;
             }
 

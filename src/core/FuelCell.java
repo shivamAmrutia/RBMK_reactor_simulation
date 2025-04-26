@@ -52,6 +52,10 @@ public class FuelCell {
 		return isXenon;
 	}
     
+    public boolean getFissile() {
+		return isFissile;
+	}
+    
     public void updateXenon() {
 		this.isXenon = false;
 	}
@@ -78,9 +82,6 @@ public class FuelCell {
     	}        
         g.fillOval(x, y, 20, 20);
     }
-
-	
-
 	
 
 }
