@@ -13,7 +13,6 @@ public class TimeManager implements Runnable {
     private Thread thread;
     private boolean running = false;
     private final int TICK_RATE_MS = 40;
-    private final ConcurrentLinkedQueue<Runnable> eventQueue = new ConcurrentLinkedQueue<>();
 
     public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel) {
         this.panel = panel;
@@ -34,10 +33,6 @@ public class TimeManager implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-    
-    public void enqueue(Runnable event) {
-        eventQueue.add(event);
     }
 
 
