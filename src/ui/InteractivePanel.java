@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -29,9 +30,16 @@ public class InteractivePanel extends JPanel {
     ////////  Timer Update method  ////////
     
     public void timerUpdate() {
-    	for (Neutron n : neutrons) {  
-    		n.move(getWidth(), getHeight());
-    	}      
+    	Iterator<Neutron> iter = neutrons.iterator();
+    	
+    	
+    	while(iter.hasNext()) {
+    		Neutron n = iter.next();
+    		if(!n.move(getWidth(), getHeight())) {
+    			iter.remove();
+    			continue;
+    		};
+    	}    
     	
     	for (Moderator m: moderators) {
     		m.update();
@@ -159,24 +167,29 @@ public class InteractivePanel extends JPanel {
     
     ////////  Paint Component  ////////
 
-    protected void paintComponent(Graphics g) {    	
+    protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        
-        for (Moderator m: moderators) {
-        	m.draw(g2d);
+
+        ArrayList<Object> drawableObjects = new ArrayList<>();
+        drawableObjects.addAll(moderators);
+        drawableObjects.addAll(connectors);
+        drawableObjects.addAll(neutrons);
+        drawableObjects.addAll(controlRods);
+
+        for (Object obj : drawableObjects) {
+            if (obj instanceof Moderator) {
+                ((Moderator) obj).draw(g2d);
+            } else if (obj instanceof GraphiteConnector) {
+                ((GraphiteConnector) obj).draw(g2d);
+            } else if (obj instanceof Neutron) {
+                ((Neutron) obj).draw(g2d);
+            } else if (obj instanceof ControlRod) {
+                ((ControlRod) obj).draw(g2d);
+            }
         }
-        for (GraphiteConnector gc: connectors) {
-        	gc.draw(g2d);
-        }
-        for (Neutron n : neutrons) {
-        	n.draw(g2d);
-        }
-        
-        for (ControlRod rod : controlRods) {
-    	    rod.draw(g2d);
-    	} 
     }
+
 
 	
 	

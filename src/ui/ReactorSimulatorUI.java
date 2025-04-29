@@ -97,7 +97,7 @@ public class ReactorSimulatorUI {
         simulationPanel.add(stopButton = new JButton("Stop Simulation"));
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(new JLabel("Control Rod Position: "));
-        simulationPanel.add(controlRodSlider = new JSlider(0, 35, 0));
+        simulationPanel.add(controlRodSlider = new JSlider(0, 70, 0));
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(temperatureLabel = new JLabel("Temperature: 0 °C"));
 
@@ -189,7 +189,7 @@ public class ReactorSimulatorUI {
     private void adjustControlRods() {
 		int sliderValue = controlRodSlider.getValue();
 		    int height = (int) ((sliderValue / 100.0) * panelHeight);
-		    // 3 parts adjusted: control rod of height (max 35% panelheight), connectors positioned after controlrods (of height =  panelheight/10), modetors postioned after both
+		    // 3 parts adjusted: control rod of height (max 35% panelheight), connectors positioned after controlrods (of height =  panelheight/10), moderators positioned after both
 		    interactiveLayer.setControlRodHeight(height);
 		    interactiveLayer.setConnectorsYPosition(height);
 		    interactiveLayer.setModeratorsYPosition(height + panelHeight / 10 );

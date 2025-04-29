@@ -21,12 +21,11 @@ public class Neutron {
        
     }
 
-    public void move(int width, int height) {
+    public boolean move(int width, int height) {
         x += dx;
         y += dy;
           
-        if (x < 0 || x > width - 6) dx = -dx;
-        if (y < 0 || y > height - 6) dy = -dy;
+        return (x >= 0 && x <= width && y >= 0 && y <= height); 
     }
     
     public void draw(Graphics2D g) {    	
