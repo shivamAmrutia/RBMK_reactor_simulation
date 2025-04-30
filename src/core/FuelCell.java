@@ -37,13 +37,14 @@ public class FuelCell {
     // Determines if this fuel cell absorbs the neutron
     public boolean absorbs(Neutron n) {
         if (isInRange(n) && this.isFissile) {        	
-            int prob = rand.nextInt(9);
-            if(prob < 6) {// 60% fission chance
-            	return true;
-            }
-            else {
-            	return false;
-            }
+//            int prob = rand.nextInt(9);
+//            if(prob < 6) {// 60% fission chance
+//            	return true;
+//            }
+//            else {
+//            	return false;
+//            }
+        	return true;
         }
         return false;
     }

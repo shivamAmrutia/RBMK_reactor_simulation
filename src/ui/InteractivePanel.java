@@ -54,6 +54,7 @@ public class InteractivePanel extends JPanel {
     		rod.update();
     		rod.absorbNearbyNeutrons(neutrons);
      	}
+    	
 
     }
     

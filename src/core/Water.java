@@ -23,7 +23,7 @@ public class Water {
     }
     
     public boolean isInRange(Neutron n) {
-        if (isEvaporated()) return false;        
+//        if (isEvaporated()) return false;        
         if (n.x > posX && n.y > posY && n.x < 30 + posX && n.y < 30 + posY) {
         	return true;
         }
@@ -32,6 +32,7 @@ public class Water {
     }
 
     public boolean absorbs(Neutron n) {
+    	if(isEvaporated()) return false;
     	Random random = new Random();
         int prob = random.nextInt(100);
         if(prob < 2) {
@@ -46,13 +47,13 @@ public class Water {
     }
 
     public void coolDown() {
-        this.temperature = (float) Math.max(this.temperature - 0.01, 0);
+        this.temperature = (float) Math.max(this.temperature - 0.1, 0);
     }
     
     public void heatUp() {
-        if (!isEvaporated()) {
-            this.temperature +=  3 + (int)(Math.random() * 5); // increase by 1–3 degrees
-        }
+//        if (!isEvaporated()) {
+            this.temperature = (float) Math.min(this.temperature + Math.random() * 3, 110); // increase by 1–3 degrees
+//        }
     }
 
     public float getTemperature() {

@@ -13,10 +13,20 @@ public class TimeManager implements Runnable {
     private Thread thread;
     private boolean running = false;
     private final int TICK_RATE_MS = 40;
+    
+    private javax.swing.JSlider controlRodSlider;
+    private javax.swing.JCheckBox autoControlCheck;
+    private int targetNeutrons;
 
-    public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel) {
+
+    public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel,javax.swing.JSlider controlRodSlider,
+            javax.swing.JCheckBox autoControlCheck,
+            int targetNeutrons) {
         this.panel = panel;
         this.fuelCellPanel = fuelCellPanel;
+        this.controlRodSlider = controlRodSlider;
+        this.autoControlCheck = autoControlCheck;
+        this.targetNeutrons = targetNeutrons;
     }
 
     public void start() {
@@ -42,15 +52,30 @@ public class TimeManager implements Runnable {
         while (running) {
             long startTime = System.currentTimeMillis();
             
-            if(ctr == 5) {
+            if(ctr == 5){
             	PhysicsEngine.makeXenon();
-            	PhysicsEngine.makeFissile(5);
+            	PhysicsEngine.makeFissile(10);
+            	panel.addRandomNeutrons(1);
             	ctr = 0;
             }
 
             // Update simulation
             panel.timerUpdate();
-            panel.addRandomNeutrons(1);
+            
+            
+            //auto-control system
+            if (autoControlCheck != null && autoControlCheck.isSelected()) {
+        	    int currentCount = panel.getNeutronCount();
+        	    int sliderValue = controlRodSlider.getValue();
+
+        	    // Simple proportional control
+        	    if (currentCount > targetNeutrons + 5 && sliderValue < 100) {
+        	        controlRodSlider.setValue(sliderValue + 1); // insert rods
+        	    } else if (currentCount < targetNeutrons - 5 && sliderValue > 0) {
+        	        controlRodSlider.setValue(sliderValue - 1); // retract rods
+        	    }
+        	}
+            
             PhysicsEngine.updatePhysics(panel.getNeutronsList(), fuelCellPanel, panel.getControlRodsList());
             
             // Schedule UI repaint on EDT

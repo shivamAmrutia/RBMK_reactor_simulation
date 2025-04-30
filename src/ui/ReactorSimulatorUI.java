@@ -31,6 +31,10 @@ public class ReactorSimulatorUI {
     private final static int cellSize = 34;
     static int panelWidth = COLS * cellSize;
     static int panelHeight = ROWS * cellSize;
+    private JCheckBox autoControlCheck;
+    private JTextField targetNeutronInput;
+    private int targetNeutrons = 30; // default
+
     private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
     private TimeManager timeManager;
 
@@ -56,8 +60,8 @@ public class ReactorSimulatorUI {
             }            
         }
         
-        //initializing timeManager to ensure fuellCells are populated before passing reference
-        timeManager = new TimeManager(interactiveLayer, fuelcells);
+        
+
         
         /////////////////  Interactive Layer (Neutrons, Moderators, and Control Rods) ///////////////////////////
         
@@ -97,9 +101,20 @@ public class ReactorSimulatorUI {
         simulationPanel.add(stopButton = new JButton("Stop Simulation"));
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(new JLabel("Control Rod Position: "));
-        simulationPanel.add(controlRodSlider = new JSlider(0, 70, 0));
+        simulationPanel.add(controlRodSlider = new JSlider(0, 100, 0));
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(temperatureLabel = new JLabel("Temperature: 0 °C"));
+        
+        simulationPanel.add(Box.createVerticalStrut(5));
+        simulationPanel.add(new JLabel("Target Neutrons: "));
+        targetNeutronInput = new JTextField("30", 5);
+        simulationPanel.add(targetNeutronInput);
+        autoControlCheck = new JCheckBox("Enable Auto-Control");
+        simulationPanel.add(autoControlCheck);
+
+        
+        //initializing timeManager to ensure fuellCells are populated before passing reference
+        timeManager = new TimeManager(interactiveLayer, fuelcells, controlRodSlider, autoControlCheck, targetNeutrons);
 
         
         
@@ -134,7 +149,15 @@ public class ReactorSimulatorUI {
             }
         });
         
-        startButton.addActionListener(e -> timeManager.start());
+        startButton.addActionListener(e -> {
+	        try {
+	            targetNeutrons = Integer.parseInt(targetNeutronInput.getText());
+	        } catch (NumberFormatException ex) {
+	            targetNeutrons = 30; // fallback
+	        }
+	        timeManager.start();
+        }
+        );
         stopButton.addActionListener(e -> timeManager.stop());
 
         frame.addWindowListener(new java.awt.event.WindowAdapter() {

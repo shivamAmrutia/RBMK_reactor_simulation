@@ -19,6 +19,7 @@ public class PhysicsEngine {
     {
         handleAbsorption(neutrons, fuelCellPanel, controlRods);
         handleFission(neutrons, fuelCellPanel);
+        handleWaterTemp(neutrons, fuelCellPanel);
     }
 
     public static void handleAbsorption(ArrayList<Neutron> neutrons,
@@ -37,15 +38,11 @@ public class PhysicsEngine {
             	for(FuelCellPanel fuelPanel : fuelCellPanelList) {
             		Water water = fuelPanel.getWater();
             		if (water.isInRange(n)) {
-            			water.heatUp();
             			if (water.absorbs(n)){
             				iter.remove();  
             				isabsorbed = true;
             			}    
             		} 
-            		else {
-            			water.coolDown();          	            			
-            		}
             	}
             	if (isabsorbed) break;
             }
@@ -69,7 +66,7 @@ public class PhysicsEngine {
         					newNeutrons.add(fuelcell.emitNeutron());
         				}
         				int prob = rand.nextInt(9);
-        		        if(prob < 3) {
+        		        if(prob < 5) {
         		        	convertToXenon.add(fuelcell);
         		        } 
         				break;
@@ -81,15 +78,29 @@ public class PhysicsEngine {
         				convertToXenon.remove(fuelcell);
         				
         			}
-        			else if(!fuelcell.getFissile()) {
-    		        	convertToFissile.add(fuelcell);
-        			}
+        			
         		}
-        		
+        		if(!fuelcell.getFissile()) {
+		        	convertToFissile.add(fuelcell);
+    			}
         	}
         	
         }
         neutrons.addAll(newNeutrons);
+    }
+    
+    public static void handleWaterTemp(ArrayList<Neutron> neutrons, FuelCellPanel[][] fuelCellPanel) {
+    	for (FuelCellPanel[] fuelCellPanelList : fuelCellPanel) {
+        	for(FuelCellPanel fuelPanel : fuelCellPanelList) {
+        		Water water = fuelPanel.getWater();
+        		for(Neutron n: neutrons) {
+        			if (water.isInRange(n)) {
+        				water.heatUp();
+        			}         			
+        		}
+        		water.coolDown();          	            			
+        	}
+        }
     }
 
     public static void makeFissile(int count) {
