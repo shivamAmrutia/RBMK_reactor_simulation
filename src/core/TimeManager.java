@@ -1,10 +1,8 @@
 package core;
 
-import java.util.ArrayList;
 
 import ui.FuelCellPanel;
 import ui.InteractivePanel;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class TimeManager implements Runnable {
@@ -17,6 +15,8 @@ public class TimeManager implements Runnable {
     private javax.swing.JSlider controlRodSlider;
     private javax.swing.JCheckBox autoControlCheck;
     private int targetNeutrons;
+    
+
 
 
     public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel,javax.swing.JSlider controlRodSlider,

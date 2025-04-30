@@ -9,6 +9,8 @@ public class Water {
     private int x, y;
     private int posX, posY;
     private static final float EVAPORATION_TEMP = 100;
+    private float coolingRate = 0.1f; // default value
+
 
     public Water(int x, int y, int posX, int posY, int temperature) {
         this.x = x;
@@ -47,7 +49,7 @@ public class Water {
     }
 
     public void coolDown() {
-        this.temperature = (float) Math.max(this.temperature - 0.1, 0);
+        this.temperature = (float) Math.max(this.temperature - coolingRate, 0);
     }
     
     public void heatUp() {
@@ -55,6 +57,11 @@ public class Water {
             this.temperature = (float) Math.min(this.temperature + Math.random() * 3, 110); // increase by 1–3 degrees
 //        }
     }
+    
+    public void setCoolingRate(float rate) {
+        this.coolingRate = rate;
+    }
+
 
     public float getTemperature() {
         return temperature;

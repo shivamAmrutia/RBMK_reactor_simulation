@@ -34,6 +34,7 @@ public class ReactorSimulatorUI {
     private JCheckBox autoControlCheck;
     private JTextField targetNeutronInput;
     private int targetNeutrons = 30; // default
+    private JCheckBox disablePumpCheck;
 
     private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
     private TimeManager timeManager;
@@ -111,11 +112,29 @@ public class ReactorSimulatorUI {
         simulationPanel.add(targetNeutronInput);
         autoControlCheck = new JCheckBox("Enable Auto-Control");
         simulationPanel.add(autoControlCheck);
+        
+        disablePumpCheck = new JCheckBox("Disable Water Pump");
+        simulationPanel.add(disablePumpCheck);
 
+        
+        //adding event listener to control water pumps
+        disablePumpCheck.addActionListener(e -> {
+            float rate = disablePumpCheck.isSelected() ? 0.05f : 0.1f;
+
+            for (int i = 0; i < fuelcells.length; i++) {
+                for (int j = 0; j < fuelcells[i].length; j++) {
+                    if (fuelcells[i][j].getWater() != null) {
+                        fuelcells[i][j].getWater().setCoolingRate(rate);
+                    }
+                }
+            }
+        });
+
+        
         
         //initializing timeManager to ensure fuellCells are populated before passing reference
         timeManager = new TimeManager(interactiveLayer, fuelcells, controlRodSlider, autoControlCheck, targetNeutrons);
-
+        	
         
         
         	///////////  Combining Bottom Panels  //////////////
