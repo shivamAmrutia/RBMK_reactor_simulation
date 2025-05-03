@@ -18,6 +18,7 @@ import db.UserManager;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import ui.LaunchPrompt;
 import ui.ReactorSimulatorUI;
 
 public class Main {
@@ -64,13 +65,22 @@ public class Main {
 
         // Create logger and user
         UserManager userManager = new UserManager(database);
-        ObjectId userId = userManager.createOrGetUser("shivam");
         MongoLogger mongoLogger = new MongoLogger(database);
-        ObjectId simulationId = mongoLogger.startSimulation(userId, 30, 30); // or dynamic values
+
+        // Launch UI to collect user + config
+        LaunchPrompt.LaunchConfig config = LaunchPrompt.promptUser(userManager);
+
+        // Start simulation using provided config
+        ObjectId simulationId = mongoLogger.startSimulation(
+            config.userId,
+            config.targetNeutrons,
+            config.fuelPercentage
+        );
+
 
 
         // Launch UI
-        SwingUtilities.invokeLater(() -> new ReactorSimulatorUI(mongoLogger, userId, simulationId));
+        SwingUtilities.invokeLater(() -> new ReactorSimulatorUI(mongoLogger, simulationId, config));
     }
 
 }

@@ -1,22 +1,17 @@
 package ui;
-import core.Neutron;
 import core.TimeManager;
 import db.MongoLogger;
-import db.UserManager;
+
 
 //import core.TimerClock;
 import javax.swing.*;
 
 import org.bson.types.ObjectId;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class ReactorSimulatorUI {
@@ -49,12 +44,17 @@ public class ReactorSimulatorUI {
     private JTextField targetNeutronInput;
     private int targetNeutrons = 30; // default
     private JCheckBox disablePumpCheck;
+    
+    private JButton openSimManagerBtn = new JButton("Manage Simulations");
 
     private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
     private TimeManager timeManager;
 
     
-    public ReactorSimulatorUI(MongoLogger mongoLogger, ObjectId userId, ObjectId simulationId) {
+    public ReactorSimulatorUI(MongoLogger mongoLogger, ObjectId simulationId, LaunchPrompt.LaunchConfig config) {
+    	
+    	this.targetNeutrons = config.targetNeutrons;
+    	
         frame = new JFrame("Chernobyl Reactor Simulator");
         frame.setSize(1000, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -71,7 +71,7 @@ public class ReactorSimulatorUI {
                 FuelCellPanel cell = new FuelCellPanel(j * cellSize, i * cellSize);
                 reactorPanel.add(cell);
                 fuelcells[i][j] = cell;
-                fuelcells[i][j].setState(false, 50);
+                fuelcells[i][j].setState(false, 30);
             }            
         }
         
@@ -100,7 +100,7 @@ public class ReactorSimulatorUI {
         	/////////// Fuel config panel (bottom left) ///////////////
         
         fuelConfigPanel = new JPanel();
-        fissileInput = new JTextField("30", 5);
+        fissileInput = new JTextField(String.valueOf(config.fuelPercentage) , 5);
         generateButton = new JButton("Generate Grid");
         fuelConfigPanel.add(new JLabel("Fissile Fuel %: "));
         fuelConfigPanel.add(fissileInput);
@@ -137,7 +137,7 @@ public class ReactorSimulatorUI {
         
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(new JLabel("Target Neutrons: "));
-        targetNeutronInput = new JTextField("30", 5);
+        targetNeutronInput = new JTextField(String.valueOf(config.targetNeutrons), 5);
         simulationPanel.add(targetNeutronInput);
         autoControlCheck = new JCheckBox("Enable Auto-Control");
         simulationPanel.add(autoControlCheck);
@@ -158,6 +158,13 @@ public class ReactorSimulatorUI {
                 }
             }
         });
+        
+        //adding simulation Manger to browse and delete
+        openSimManagerBtn.addActionListener(e -> {
+            new SimulationManagerUI(mongoLogger, config.userId); // create and show manager
+        });
+        
+        simulationPanel.add(openSimManagerBtn);
         
    
         

@@ -1,6 +1,7 @@
 package db;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
@@ -10,6 +11,8 @@ import org.bson.types.ObjectId;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class MongoLogger {
     private final MongoCollection<Document> simulations;
@@ -44,7 +47,36 @@ public class MongoLogger {
     }
 
     // Optional: fetch all simulations by user
-    public Iterable<Document> getSimulationsByUser(ObjectId userId) {
-        return simulations.find(Filters.eq("userId", userId));
+    public MongoCursor<Document> getSimulationsByUser(ObjectId userId) {
+    	return simulations.find(Filters.eq("userId", userId)).iterator();
     }
+    
+    public void logTargetChange(ObjectId simulationId, long tick, int targetNeutrons) {
+        Document change = new Document("tick", tick).append("value", targetNeutrons);
+        simulations.updateOne(
+            Filters.eq("_id", simulationId),
+            Updates.push("targetChanges", change)
+        );
+    }
+    
+    public List<Document> getSnapshots(ObjectId simulationId) {
+        Document sim = simulations.find(Filters.eq("_id", simulationId)).first();
+        if (sim != null && sim.containsKey("snapshots")) {
+            return (List<Document>) sim.get("snapshots");
+        }
+        return Collections.emptyList();
+    }
+    
+    public Document getFullSimulation(ObjectId simulationId) {
+        return simulations.find(Filters.eq("_id", simulationId)).first();
+    }
+
+    
+    public boolean deleteSimulation(ObjectId simulationId) {
+        long deletedCount = simulations.deleteOne(Filters.eq("_id", simulationId)).getDeletedCount();
+        return deletedCount > 0;
+    }
+
+
+
 }

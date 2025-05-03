@@ -1,6 +1,9 @@
 package core;
 
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.bson.types.ObjectId;
 
 import db.MongoLogger;
@@ -20,11 +23,15 @@ public class TimeManager implements Runnable {
     private javax.swing.JLabel temperatureLabel;
     private javax.swing.JLabel powerLabel;
     private int targetNeutrons;
+    private final Map<Long, Integer> targetNeutronLog = new TreeMap<>();
+
     
     //db
     private db.MongoLogger mongoLogger;
     private org.bson.types.ObjectId simulationId;
     
+    //Global tick
+    private long simulationTick = 0;
 
 
 
@@ -43,12 +50,17 @@ public class TimeManager implements Runnable {
         this.targetNeutrons = targetNeutrons;
         this.mongoLogger = mongoLogger;
         this.simulationId = simulationId;
+        
+        targetNeutronLog.put(0L, targetNeutrons);
     }
     
     public void setTargetNeutrons(int targetNeutrons) {
-    	this.targetNeutrons = targetNeutrons;
-    	return;
+        this.targetNeutrons = targetNeutrons;
+        if (running) {
+        	 mongoLogger.logTargetChange(simulationId, (long) simulationTick, targetNeutrons); // record change
+        }
     }
+
 
     public void start() {
         if (running) return;
@@ -70,7 +82,6 @@ public class TimeManager implements Runnable {
     @Override
     public void run() {
     	int ctr = 1;
-    	long simulationTick = 0;
     	
         while (running) {
             long startTime = System.currentTimeMillis();
