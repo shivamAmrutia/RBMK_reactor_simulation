@@ -11,7 +11,13 @@ import com.mongodb.ServerApiVersion;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
+
+import db.MongoLogger;
+import db.UserManager;
+
 import org.bson.Document;
+import org.bson.types.ObjectId;
+
 import ui.ReactorSimulatorUI;
 
 public class Main {
@@ -19,30 +25,52 @@ public class Main {
     private static final Properties properties = new Properties();
 	
     public static void main(String[] args) {
-    	
-    	SwingUtilities.invokeLater(ReactorSimulatorUI::new);
-    	
-    	Dotenv dotenv = Dotenv.load();
+        // Load environment variables
+        Dotenv dotenv = Dotenv.load();
         String username = dotenv.get("db.username");
         String password = dotenv.get("db.pass");
-        String connectionString = "mongodb+srv://" + username + ":" + password + "@cluster0.g1zsw5m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";      
-        
+
+        if (username == null || password == null) {
+            System.err.println("❌ Missing MongoDB credentials in .env file.");
+            return;
+        }
+
+        // Build MongoDB connection string
+        String connectionString = "mongodb+srv://" + username + ":" + password +
+                "@cluster0.g1zsw5m.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+        // Set server API version (optional for newer MongoDB clients)
         ServerApi serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
                 .build();
+
         MongoClientSettings settings = MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
                 .serverApi(serverApi)
                 .build();
-        try (MongoClient mongoClient = MongoClients.create(settings)) {
-            try {
-                // Send a ping to confirm a successful connection
-                MongoDatabase database = mongoClient.getDatabase("admin");
-                database.runCommand(new Document("ping", 1));
-                System.out.println("Pinged your deployment. You successfully connected to MongoDB!");
-            } catch (MongoException e) {
-                e.printStackTrace();
-            }
+
+        // Initialize DB, create user and logger
+        MongoClient mongoClient = MongoClients.create(settings);
+        MongoDatabase database = mongoClient.getDatabase("rbmk_simulator");
+
+        try {
+            database.runCommand(new Document("ping", 1));
+            System.out.println("✅ Connected to MongoDB!");
+        } catch (MongoException e) {
+            System.err.println("❌ Failed to ping MongoDB:");
+            e.printStackTrace();
+            return;
         }
+
+        // Create logger and user
+        UserManager userManager = new UserManager(database);
+        ObjectId userId = userManager.createOrGetUser("shivam");
+        MongoLogger mongoLogger = new MongoLogger(database);
+        ObjectId simulationId = mongoLogger.startSimulation(userId, 30, 30); // or dynamic values
+
+
+        // Launch UI
+        SwingUtilities.invokeLater(() -> new ReactorSimulatorUI(mongoLogger, userId, simulationId));
     }
+
 }

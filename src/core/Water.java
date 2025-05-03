@@ -66,6 +66,48 @@ public class Water {
     public float getTemperature() {
         return temperature;
     }
+    
+    public static float getAverageTemperature(ui.FuelCellPanel[][] grid) {
+        float total = 0;
+        int count = 0;
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                Water w = grid[i][j].getWater();
+                if (w != null) {
+                    total += w.getTemperature();
+                    count++;
+                }
+            }
+        }
+
+        return count > 0 ? total / count : 0;
+    }
+    
+    public static float calculatePowerOutput(ui.FuelCellPanel[][] grid) {
+        int steamCells = 0;
+
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+                Water w = grid[i][j].getWater();
+                if (w != null && w.isEvaporated()) {
+                    steamCells++;
+                }
+            }
+        }
+
+        // Calibrate: 50 steam cells → ~1500 MW → 30 MW per steam cell
+        float powerPerSteamCell = 30f;
+
+        return steamCells * powerPerSteamCell;
+    }
+
+
+
+
+
+
+
 
 
     public void draw(Graphics g) {

@@ -1,9 +1,18 @@
 package ui;
 import core.Neutron;
 import core.TimeManager;
+import db.MongoLogger;
+import db.UserManager;
 
 //import core.TimerClock;
 import javax.swing.*;
+
+import org.bson.types.ObjectId;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,7 +32,12 @@ public class ReactorSimulatorUI {
     private JButton stopButton;
     private JTextField fissileInput;
     private JSlider controlRodSlider;
+    private JPanel tempRow;
+    private JLabel temperatureLabelText;
     private JLabel temperatureLabel;
+    private JPanel powerRow;
+    private JLabel powerLabelText;
+    private JLabel powerLabel;
     private JLabel neutronCountLabel;
     private FuelCellPanel[][] fuelcells;
     private final static int COLS = 30;
@@ -40,7 +54,7 @@ public class ReactorSimulatorUI {
     private TimeManager timeManager;
 
     
-    public ReactorSimulatorUI() {
+    public ReactorSimulatorUI(MongoLogger mongoLogger, ObjectId userId, ObjectId simulationId) {
         frame = new JFrame("Chernobyl Reactor Simulator");
         frame.setSize(1000, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -104,7 +118,22 @@ public class ReactorSimulatorUI {
         simulationPanel.add(new JLabel("Control Rod Position: "));
         simulationPanel.add(controlRodSlider = new JSlider(0, 100, 0));
         simulationPanel.add(Box.createVerticalStrut(5));
-        simulationPanel.add(temperatureLabel = new JLabel("Temperature: 0 °C"));
+        
+        tempRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        temperatureLabelText = new JLabel("Avg. Temperature (°C): ");
+        temperatureLabel = new JLabel("0");
+        tempRow.add(temperatureLabelText);
+        tempRow.add(temperatureLabel);
+        
+        simulationPanel.add(tempRow);
+        
+        powerRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        powerLabelText = new JLabel("Power Output (MW): ");
+        powerLabel = new JLabel("0");
+        powerRow.add(powerLabelText);
+        powerRow.add(powerLabel);
+        simulationPanel.add(powerRow);
+
         
         simulationPanel.add(Box.createVerticalStrut(5));
         simulationPanel.add(new JLabel("Target Neutrons: "));
@@ -129,11 +158,11 @@ public class ReactorSimulatorUI {
                 }
             }
         });
-
         
+   
         
         //initializing timeManager to ensure fuellCells are populated before passing reference
-        timeManager = new TimeManager(interactiveLayer, fuelcells, controlRodSlider, autoControlCheck, targetNeutrons);
+        timeManager = new TimeManager(interactiveLayer, fuelcells, controlRodSlider, autoControlCheck, temperatureLabel, powerLabel, targetNeutrons, mongoLogger, simulationId);
         	
         
         
@@ -170,7 +199,7 @@ public class ReactorSimulatorUI {
         
         startButton.addActionListener(e -> {
 	        try {
-	            targetNeutrons = Integer.parseInt(targetNeutronInput.getText());
+	            timeManager.setTargetNeutrons(Integer.parseInt(targetNeutronInput.getText()));
 	        } catch (NumberFormatException ex) {
 	            targetNeutrons = 30; // fallback
 	        }
