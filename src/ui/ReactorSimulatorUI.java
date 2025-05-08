@@ -1,5 +1,6 @@
 package ui;
 import core.TimeManager;
+import db.UserManager;
 import db.MongoLogger;
 
 
@@ -10,8 +11,6 @@ import org.bson.types.ObjectId;
 
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Random;
 
 public class ReactorSimulatorUI {
@@ -19,13 +18,14 @@ public class ReactorSimulatorUI {
     private JFrame frame;
     private JPanel reactorPanel;
     private JPanel controlsPanel;
+    private JPanel fuelConfigPanelParent;
+    private JPanel managePanel;
     private JPanel fuelConfigPanel;
     private JPanel countPanel;
     private JPanel simulationPanel;
-    private JButton generateButton;
+    private JButton resetButton;
     private JButton startButton;
     private JButton stopButton;
-    private JTextField fissileInput;
     private JSlider controlRodSlider;
     private JPanel tempRow;
     private JLabel temperatureLabelText;
@@ -35,7 +35,8 @@ public class ReactorSimulatorUI {
     private JLabel powerLabel;
     private JLabel neutronCountLabel;
     private FuelCellPanel[][] fuelcells;
-    private final static int COLS = 30;
+    private int fissileInput;
+    private final static int COLS = 32;
     private final static int ROWS = 15;
     private final static int cellSize = 34;
     static int panelWidth = COLS * cellSize;
@@ -46,17 +47,24 @@ public class ReactorSimulatorUI {
     private JCheckBox disablePumpCheck;
     
     private JButton openSimManagerBtn = new JButton("Manage Simulations");
+    
+    private db.UserManager userManager;
+    private db.MongoLogger mongoLogger;
+
 
     private static InteractivePanel interactiveLayer = new InteractivePanel(panelWidth, panelHeight, cellSize); 
     private TimeManager timeManager;
 
     
-    public ReactorSimulatorUI(MongoLogger mongoLogger, ObjectId simulationId, LaunchPrompt.LaunchConfig config) {
+    public ReactorSimulatorUI(UserManager userManager, MongoLogger mongoLogger, ObjectId simulationId, LaunchPrompt.LaunchConfig config) {
     	
+    	this.userManager = userManager;
+    	this.mongoLogger = mongoLogger;
     	this.targetNeutrons = config.targetNeutrons;
     	
+    	
         frame = new JFrame("Chernobyl Reactor Simulator");
-        frame.setSize(1000, 800);
+        frame.setSize(1100, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
@@ -99,51 +107,56 @@ public class ReactorSimulatorUI {
 
         	/////////// Fuel config panel (bottom left) ///////////////
         
-        fuelConfigPanel = new JPanel();
-        fissileInput = new JTextField(String.valueOf(config.fuelPercentage) , 5);
-        generateButton = new JButton("Generate Grid");
-        fuelConfigPanel.add(new JLabel("Fissile Fuel %: "));
-        fuelConfigPanel.add(fissileInput);
-        fuelConfigPanel.add(generateButton);
+        fuelConfigPanelParent = new JPanel();
+        fuelConfigPanelParent.setLayout(new BoxLayout(fuelConfigPanelParent, BoxLayout.Y_AXIS));
+        fuelConfigPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        fissileInput = config.fuelPercentage;
+        resetButton = new JButton("Reset Simulation");
+        fuelConfigPanel.add(resetButton);
+        fuelConfigPanel.add(startButton = new JButton("Start Simulation"));
+        fuelConfigPanel.add(stopButton = new JButton("Stop Simulation"));
+        
+        fuelConfigPanelParent.add(fuelConfigPanel, BorderLayout.CENTER);
+        managePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        managePanel.add(openSimManagerBtn);
+        
+        fuelConfigPanelParent.add(fuelConfigPanel);
+        fuelConfigPanelParent.add(managePanel);
 
         	/////////// Simulation control panel (bottom right) ////////////////
         
         simulationPanel = new JPanel();
         simulationPanel.setLayout(new BoxLayout(simulationPanel, BoxLayout.Y_AXIS));
         simulationPanel.add(Box.createVerticalStrut(5));
-        simulationPanel.add(startButton = new JButton("Start Simulation"));
         simulationPanel.add(Box.createVerticalStrut(5));
-        simulationPanel.add(stopButton = new JButton("Stop Simulation"));
         simulationPanel.add(Box.createVerticalStrut(5));
-        simulationPanel.add(new JLabel("Control Rod Position: "));
+        
+        
+        JLabel rodLabel = new JLabel("Control Rod Position:");
+        rodLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        simulationPanel.add(rodLabel);
         simulationPanel.add(controlRodSlider = new JSlider(0, 100, 0));
         simulationPanel.add(Box.createVerticalStrut(5));
         
-        tempRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-        temperatureLabelText = new JLabel("Avg. Temperature (°C): ");
-        temperatureLabel = new JLabel("0");
-        tempRow.add(temperatureLabelText);
-        tempRow.add(temperatureLabel);
         
-        simulationPanel.add(tempRow);
+        simulationPanel.add(Box.createVerticalStrut(20));
         
-        powerRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        powerLabelText = new JLabel("Power Output (MW): ");
-        powerLabel = new JLabel("0");
-        powerRow.add(powerLabelText);
-        powerRow.add(powerLabel);
-        simulationPanel.add(powerRow);
+        JPanel targetRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        targetRow.add(new JLabel("Target Neutrons:"));
+        targetNeutronInput = new JTextField(String.valueOf(config.targetNeutrons), 5);
+        targetRow.add(targetNeutronInput);
+        simulationPanel.add(targetRow);
 
         
-        simulationPanel.add(Box.createVerticalStrut(5));
-        simulationPanel.add(new JLabel("Target Neutrons: "));
-        targetNeutronInput = new JTextField(String.valueOf(config.targetNeutrons), 5);
-        simulationPanel.add(targetNeutronInput);
-        autoControlCheck = new JCheckBox("Enable Auto-Control");
-        simulationPanel.add(autoControlCheck);
         
-        disablePumpCheck = new JCheckBox("Disable Water Pump");
-        simulationPanel.add(disablePumpCheck);
+        JPanel checkboxRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0)); 
+        checkboxRow.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        checkboxRow.add(autoControlCheck = new JCheckBox("Enable Auto-Control"));
+        checkboxRow.add(disablePumpCheck = new JCheckBox("Disable Water Pump"));        
+        simulationPanel.add(checkboxRow);
+        simulationPanel.add(Box.createVerticalStrut(20)); 
+        
+        
 
         
         //adding event listener to control water pumps
@@ -163,19 +176,13 @@ public class ReactorSimulatorUI {
         openSimManagerBtn.addActionListener(e -> {
             new SimulationManagerUI(mongoLogger, config.userId); // create and show manager
         });
-        
-        simulationPanel.add(openSimManagerBtn);
-        
-   
-        
-        //initializing timeManager to ensure fuellCells are populated before passing reference
-        timeManager = new TimeManager(interactiveLayer, fuelcells, controlRodSlider, autoControlCheck, temperatureLabel, powerLabel, targetNeutrons, mongoLogger, simulationId);
+
         	
         
         
         	///////////  Combining Bottom Panels  //////////////
-        controlsPanel.add(fuelConfigPanel, BorderLayout.WEST);
-        controlsPanel.add(simulationPanel, BorderLayout.CENTER);
+        controlsPanel.add(fuelConfigPanelParent, BorderLayout.WEST);
+        controlsPanel.add(simulationPanel, BorderLayout.EAST);
 
         frame.add(controlsPanel, BorderLayout.SOUTH);
         
@@ -190,19 +197,34 @@ public class ReactorSimulatorUI {
         
 	    frame.add(countPanel, BorderLayout.NORTH);
 	    
+	    tempRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        temperatureLabelText = new JLabel("Avg. Temperature (°C): ");
+        temperatureLabel = new JLabel("0");
+        tempRow.add(temperatureLabelText);
+        tempRow.add(temperatureLabel);
+        countPanel.add(Box.createHorizontalStrut(20)); 
+        countPanel.add(tempRow);
+        
+        powerRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        powerLabelText = new JLabel("Power Output (MW): ");
+        powerLabel = new JLabel("0");
+        powerRow.add(powerLabelText);
+        powerRow.add(powerLabel);
+        countPanel.add(Box.createHorizontalStrut(20)); 
+        countPanel.add(powerRow);
+	    
         //////////////// Action listeners  ///////////////////
        
           //// Adjusting Control Rods //// 
 	    controlRodSlider.addChangeListener(e -> adjustControlRods());
         
-	      //// Generate Simulation ////
-        generateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generateFuelGrid();
-                generateinteractiveLayer();                
-            }
-        });
+	    
+	    
+
+	    //initializing timeManager to ensure fuellCells are populated before passing reference
+	    timeManager = new TimeManager(interactiveLayer, fuelcells, config.fuelPercentage, controlRodSlider, autoControlCheck, temperatureLabel, powerLabel, targetNeutrons, mongoLogger, simulationId);
+	    
+        resetButton.addActionListener(e -> resetSimulation());
         
         startButton.addActionListener(e -> {
 	        try {
@@ -220,8 +242,11 @@ public class ReactorSimulatorUI {
                 timeManager.stop(); // stop thread on close
             }
         });
-
         
+      //call generate methods
+        generateFuelGrid();
+        generateinteractiveLayer();        
+
         frame.setVisible(true);
     }
 	    
@@ -246,7 +271,7 @@ public class ReactorSimulatorUI {
 	private void generateFuelGrid() {
 	    int percentage;
 	    try {
-	        percentage = Integer.parseInt(fissileInput.getText());
+	        percentage = fissileInput;
 	    } catch (NumberFormatException e) {
 	        JOptionPane.showMessageDialog(frame, "Enter a valid percentage (0-100)");
 	        return;
@@ -272,6 +297,30 @@ public class ReactorSimulatorUI {
 		    interactiveLayer.setConnectorsYPosition(height);
 		    interactiveLayer.setModeratorsYPosition(height + panelHeight / 10 );
 	    }
+   
+    private void resetSimulation() {
+        // Step 1: Stop current simulation
+        timeManager.stop();
+
+        // Step 2: Show prompt again
+        LaunchPrompt.LaunchConfig config = LaunchPrompt.promptUser(userManager);
+
+        // Step 3: Reset fuel grid and control Rod Slider
+        this.fissileInput = config.fuelPercentage;
+        this.targetNeutrons = config.targetNeutrons;
+        targetNeutronInput.setText(String.valueOf(config.targetNeutrons));
+        controlRodSlider.setValue(0);
+
+
+        // Step 4: Regenerate grid & interactive layer
+        generateFuelGrid();
+        generateinteractiveLayer();
+
+        // Step 5: Create new simulationId and TimeManager
+        ObjectId newSimulationId = mongoLogger.startSimulation(config.userId, config.targetNeutrons, config.fuelPercentage);
+        this.timeManager = new TimeManager(interactiveLayer, fuelcells, config.fuelPercentage,controlRodSlider, autoControlCheck,
+                temperatureLabel, powerLabel, config.targetNeutrons, mongoLogger, newSimulationId);
+    }
     	
 }
 

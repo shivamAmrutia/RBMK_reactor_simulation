@@ -116,6 +116,7 @@ public class InteractivePanel extends JPanel {
     public void setupControlRods() {
         controlRods.clear();
         moderators.clear();
+        connectors.clear();
         for (int i = 2; i < panelWidth / cellSize; i += 4) {
         	// Rods from top
             int x = (i - 1) * cellSize + (cellSize - 2);

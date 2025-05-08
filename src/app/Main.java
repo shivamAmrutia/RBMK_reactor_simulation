@@ -2,7 +2,6 @@ package app;
 
 import javax.swing.SwingUtilities;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Properties;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoException;
@@ -22,8 +21,6 @@ import ui.LaunchPrompt;
 import ui.ReactorSimulatorUI;
 
 public class Main {
-
-    private static final Properties properties = new Properties();
 	
     public static void main(String[] args) {
         // Load environment variables
@@ -80,7 +77,7 @@ public class Main {
 
 
         // Launch UI
-        SwingUtilities.invokeLater(() -> new ReactorSimulatorUI(mongoLogger, simulationId, config));
+        SwingUtilities.invokeLater(() -> new ReactorSimulatorUI(userManager, mongoLogger, simulationId, config));
     }
 
 }

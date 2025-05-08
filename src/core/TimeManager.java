@@ -23,6 +23,7 @@ public class TimeManager implements Runnable {
     private javax.swing.JLabel temperatureLabel;
     private javax.swing.JLabel powerLabel;
     private int targetNeutrons;
+    private int targetFuelPercent;
     private final Map<Long, Integer> targetNeutronLog = new TreeMap<>();
 
     
@@ -35,7 +36,7 @@ public class TimeManager implements Runnable {
 
 
 
-    public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel,javax.swing.JSlider controlRodSlider,
+    public TimeManager(InteractivePanel panel, FuelCellPanel[][] fuelCellPanel, int targetFuelPercent,javax.swing.JSlider controlRodSlider,
             javax.swing.JCheckBox autoControlCheck,
             javax.swing.JLabel temperatureLabel,
             javax.swing.JLabel powerLabel,
@@ -43,6 +44,7 @@ public class TimeManager implements Runnable {
             MongoLogger mongoLogger, ObjectId simulationId) {
         this.panel = panel;
         this.fuelCellPanel = fuelCellPanel;
+        this.targetFuelPercent = targetFuelPercent;
         this.controlRodSlider = controlRodSlider;
         this.autoControlCheck = autoControlCheck;
         this.temperatureLabel = temperatureLabel;
@@ -59,6 +61,20 @@ public class TimeManager implements Runnable {
         if (running) {
         	 mongoLogger.logTargetChange(simulationId, (long) simulationTick, targetNeutrons); // record change
         }
+    }
+    
+    public int getFissilePercent() {
+    	int count = 0;
+    	for(FuelCellPanel[] fuelCellRow: fuelCellPanel) {
+    		for(FuelCellPanel fuelCell: fuelCellRow) {
+    			if(fuelCell.checkFissile()){
+    				count++;
+    			}
+    		}
+    		
+    	}
+    	
+    	return (count*100)/480;
     }
 
 
@@ -88,7 +104,10 @@ public class TimeManager implements Runnable {
             
             if(ctr % 5 == 0){
             	PhysicsEngine.makeXenon();
-            	PhysicsEngine.makeFissile(10);
+            	int diff = targetFuelPercent - getFissilePercent();
+              	if(diff > 0) {
+            		PhysicsEngine.makeFissile( (int)(diff*4.8));            		
+            	}
             	panel.addRandomNeutrons(1);
             }
             

@@ -54,6 +54,12 @@ public class FuelCellPanel extends JPanel {
 	public void addFuelCell() {
 		 this.fuelcell = new FuelCell(x, y, posX, posY, isFissile);
 	}
+	
+	
+	public Boolean checkFissile() {
+		return this.fuelcell.getFissile();
+	}
+	
     
     @Override
     protected void paintComponent(Graphics g) {

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.DefaultListModel;
@@ -18,7 +17,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.text.Document;
 
 import org.bson.types.ObjectId;
 
@@ -105,7 +103,7 @@ public class SimulationManagerUI extends JFrame {
         if (selected != null) {
             org.bson.Document simulationDoc = mongoLogger.getFullSimulation(selectedId);  // ⬅️ Full doc, not just snapshots
             JFileChooser chooser = new JFileChooser();
-            chooser.setSelectedFile(new File("simulation_" + selected + ".json"));
+            chooser.setSelectedFile(new File("simulation_" + selectedId + ".json"));
 
             if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 try (FileWriter writer = new FileWriter(chooser.getSelectedFile())) {
