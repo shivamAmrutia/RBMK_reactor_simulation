@@ -3,6 +3,7 @@ package core;
 
 import java.util.Map;
 import java.util.TreeMap;
+import javax.swing.JOptionPane;
 
 import org.bson.types.ObjectId;
 
@@ -17,6 +18,9 @@ public class TimeManager implements Runnable {
     private Thread thread;
     private boolean running = false;
     private final int TICK_RATE_MS = 40;
+    
+    private static final float MAX_TEMPERATURE = 100.0f;   // threshold for meltdown
+    private boolean alertShown = false;
     
     private javax.swing.JSlider controlRodSlider;
     private javax.swing.JCheckBox autoControlCheck;
@@ -149,6 +153,20 @@ public class TimeManager implements Runnable {
             
             //save power
             float power = Water.calculatePowerOutput(fuelCellPanel);
+            
+            if (!alertShown && avgTemp > MAX_TEMPERATURE) {
+                alertShown = true;
+                javax.swing.SwingUtilities.invokeLater(() ->
+                    JOptionPane.showMessageDialog(
+                        panel,
+                        "Reactor core has blown! Simulation will stop.",
+                        "Core Meltdown Alert",
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                );
+                stop();
+                break;
+            }
             
             // Schedule UI repaint on EDT
             javax.swing.SwingUtilities.invokeLater(panel::repaint);
